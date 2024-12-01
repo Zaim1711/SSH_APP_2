@@ -1,0 +1,38 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "sshchatfitur",
+          "appId": "1:453171651477:android:8c85e873d51e34e58ccc9c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "sshchatfitur",
+          "configurations": {
+            "android": "1:453171651477:android:8c85e873d51e34e58ccc9c",
+            "ios": "1:453171651477:ios:6b2d312c5b0ce95e8ccc9c",
+            "macos": "1:453171651477:ios:6b2d312c5b0ce95e8ccc9c",
+            "web": "1:453171651477:web:b063a93aeddc69d28ccc9c",
+            "windows": "1:453171651477:web:4b80339683e52fc68ccc9c"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
