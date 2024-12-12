@@ -164,7 +164,7 @@ class _UserListChatState extends State<UserListChat> {
                   userEmail) // Filter out the logged-in user by email
               .where((user) => user.roles.any((role) =>
                   role.name ==
-                  'ROLE_PSYCOLOGIST')) // Filter users with ROLE_PSYCOLOGIST
+                  'ROLE_KONSULTAN')) // Filter users with ROLE_PSYCOLOGIST
               .toList();
 
           return ListView.builder(

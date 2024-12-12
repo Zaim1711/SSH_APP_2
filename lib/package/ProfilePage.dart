@@ -11,6 +11,7 @@ import 'package:ssh_aplication/component/logout_button.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/LoginPage.dart';
 import 'package:ssh_aplication/package/TestMultiPage.dart';
+import 'package:ssh_aplication/package/UserDetailsPage.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -325,29 +326,55 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    const Positioned(
+                    Positioned(
                       left: 62,
                       top: 283,
-                      child: Text(
-                        'My Address',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w700,
+                      child: InkWell(
+                        onTap: () {
+                          // Tambahkan logika navigasi atau tindakan yang diinginkan di sini
+                          print('My Address clicked');
+                          // Misalnya, navigasi ke halaman alamat
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UserDetailsPage()), // Ganti dengan halaman alamat yang sesuai
+                          );
+                        },
+                        child: Text(
+                          'My Address',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                    const Positioned(
+                    Positioned(
                       left: 62,
                       top: 331,
-                      child: Text(
-                        'Account',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w700,
+                      child: InkWell(
+                        onTap: () {
+                          // Tambahkan logika navigasi atau tindakan yang diinginkan di sini
+                          print('Account clicked');
+                          // Misalnya, navigasi ke halaman akun
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UserDetailsPage()), // Ganti dengan halaman akun yang sesuai
+                          );
+                        },
+                        child: Text(
+                          'Account',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),

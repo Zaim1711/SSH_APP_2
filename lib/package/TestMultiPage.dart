@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
+import 'package:ssh_aplication/package/InputUserDetails.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
 
 class MultiPageForm extends StatefulWidget {
@@ -26,10 +27,91 @@ class _MultiPageFormState extends State<MultiPageForm> {
   int _currentIndex = 3;
   Map<String, dynamic> payload = {};
   String id = '';
+  TextEditingController _nikController =
+      TextEditingController(); // Controller untuk NIK
+
+  TextEditingController _namaController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _checkUserDetails();
+  }
+
+  Future<void> _checkUserDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accesToken');
+
+    if (accessToken != null && !JwtDecoder.isExpired(accessToken)) {
+      try {
+        var payload = JwtDecoder.decode(accessToken);
+        this.id = payload['sub'].split(',')[0].toString();
+
+        String nama =
+            payload['sub'].split(',')[2].toString(); // Ambil ID pengguna
+
+        print('ID pengguna: $id'); // Debug print untuk ID pengguna
+
+        final response = await http.get(
+          Uri.parse('http://10.0.2.2:8080/details/user/$id'),
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          var userDetails = jsonDecode(response.body);
+          print(response.body);
+
+          String nik = userDetails['nik'].toString();
+          setState(() {
+            _nikController.text = nik; // Mengatur nilai controller
+            _namaController.text = nama;
+          });
+          print(nik);
+
+          if (userDetails.isEmpty) {
+            _showDataNotFoundDialog();
+          }
+        } else if (response.statusCode == 404) {
+          // Tangani 404 Not Found
+          _showDataNotFoundDialog();
+        } else {
+          print(
+              'Error fetching user details: ${response.statusCode} - ${response.body}');
+        }
+      } catch (e) {
+        print('Gagal mendekode token: $e');
+      }
+    } else {
+      print('Token akses tidak tersedia atau telah kedaluwarsa');
+    }
+  }
+
+  void _showDataNotFoundDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Profile anda belum lengkap'),
+          content: const Text(
+              'Data profile anda belum lengkap. Silakan isi data pengguna terlebih dahulu agar dapat melakukan pelaporan.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+                // Navigasi ke halaman pengisian data pengguna
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InputUserDetails()),
+                );
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _onItemTapped(int index) {
@@ -95,8 +177,8 @@ class _MultiPageFormState extends State<MultiPageForm> {
   String _statuspelapor = '';
   String _jeniskekerasan = '';
   String _deskripsi = '';
-  DateTime _selectedDateKekerasan = DateTime.now();
   DateTime? _selectedDateTanggalLahir;
+  DateTime _selectedDateKekerasan = DateTime.now();
 
   void _submitForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
@@ -350,8 +432,9 @@ class _MultiPageFormState extends State<MultiPageForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
-                initialValue: _nik,
+                controller: _nikController, // Menggunakan controller untuk NIK
                 decoration: const InputDecoration(labelText: 'NIK'),
+                readOnly: true, // Menjadikan field ini tidak dapat diedit
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'NIK tidak boleh kosong';
@@ -364,8 +447,9 @@ class _MultiPageFormState extends State<MultiPageForm> {
               ),
               const SizedBox(height: 20),
               TextFormField(
-                initialValue: _nama,
+                controller: _namaController,
                 decoration: const InputDecoration(labelText: 'Nama'),
+                readOnly: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nama tidak boleh kosong';
@@ -439,7 +523,8 @@ class _MultiPageFormState extends State<MultiPageForm> {
                       );
                       if (selectedDate != null) {
                         setState(() {
-                          _selectedDateTanggalLahir = selectedDate;
+                          _selectedDateTanggalLahir =
+                              selectedDate; // Simpan tanggal lahir yang dipilih
                         });
                       }
                     },
@@ -616,7 +701,7 @@ class _MultiPageFormState extends State<MultiPageForm> {
                               selectedDateTime.day,
                               selectedTime.hour,
                               selectedTime.minute,
-                            );
+                            ); // Simpan tanggal kekerasan yang dipilih
                           });
                         }
                       }

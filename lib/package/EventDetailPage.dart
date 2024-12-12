@@ -8,7 +8,6 @@ import 'package:ssh_aplication/package/ProfilePage.dart';
 import 'package:ssh_aplication/package/TestInfromasiPage.dart';
 import 'package:ssh_aplication/package/TestMultiPage.dart';
 import 'package:ssh_aplication/package/UserListChat.dart';
-import 'package:ssh_aplication/package/community_search.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Map<String, dynamic> laporan;
@@ -34,10 +33,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
       _currentIndex = index;
       // Navigasi berdasarkan indeks yang dipilih
       switch (index) {
-        case 0:
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Community_Search()));
-          break;
         case 1:
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => ProfilePage()));

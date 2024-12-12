@@ -174,34 +174,6 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 15),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //         child: Divider(
-                //           thickness: 1,
-                //           color: Colors.grey[400],
-                //         ),
-                //       ),
-                //       const Padding(
-                //         padding: EdgeInsets.symmetric(horizontal: 10.0),
-                //         child: Text('Or sign in with'),
-                //       ),
-                //       Expanded(
-                //         child: Divider(
-                //           thickness: 1,
-                //           color: Colors.grey[400],
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                // const SizedBox(height: 15),
-                // // Google button
-                // MyGoogleBtn(
-                //   onTap: googleSignin,
-                // ),
                 const SizedBox(height: 15),
                 // Sign In row
                 Container(
