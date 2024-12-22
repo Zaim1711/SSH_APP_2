@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
+import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
 import 'package:ssh_aplication/package/TestInfromasiPage.dart';
-import 'package:ssh_aplication/package/TestMultiPage.dart';
 import 'package:ssh_aplication/package/UserListChat.dart';
 
 class EventDetailPage extends StatefulWidget {
@@ -107,11 +105,14 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     // Gambar laporan
                     ClipRRect(
                       borderRadius: BorderRadius.circular(30),
-                      child: Image.file(
-                        File(widget.imagePath),
+                      child: Image.network(
+                        'http://10.0.2.2:8080/pengaduan/image/${widget.imagePath}', // Menggunakan URL
                         width: double.infinity,
                         height: 250,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(child: Text('Gambar tidak tersedia'));
+                        },
                       ),
                     ),
                     const SizedBox(height: 10), // Jarak antara gambar dan teks
@@ -191,9 +192,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
               const SizedBox(
                   height: 20), // Jarak antara kotak status dan kolom konsultasi
 
-              const SizedBox(
-                  height: 20), // Jarak antara kotak status dan kolom konsultasi
-
               // Kolom untuk konsultasi
               Container(
                 padding: const EdgeInsets.all(16.0),
@@ -258,8 +256,6 @@ class _EventDetailPageState extends State<EventDetailPage> {
               const SizedBox(
                   height:
                       20), // Jarak antara kolom konsultasi dan bottom navigation bar
-
-              // Bottom Navigation Bar
             ],
           ),
         ),

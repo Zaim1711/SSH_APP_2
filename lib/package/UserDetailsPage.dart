@@ -8,8 +8,8 @@ import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/model/DetailsUser.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/EditProfilePage.dart';
+import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
-import 'package:ssh_aplication/package/TestMultiPage.dart';
 
 class UserDetailsPage extends StatefulWidget {
   const UserDetailsPage({super.key});

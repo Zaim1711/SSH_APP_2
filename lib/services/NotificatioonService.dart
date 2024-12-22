@@ -178,6 +178,7 @@ class NotificationService {
     try {
       // Mendapatkan token perangkat
       String? deviceToken = await messaging.getToken();
+      print(deviceToken);
       if (deviceToken != null) {
         // Mendapatkan ID pengguna dari token akses
         await decodeTokenAndSendToServer(deviceToken);
@@ -268,7 +269,7 @@ class NotificationService {
     });
   }
 
-  Future<void> sendNotification(
+  Future<void> sendNotificationChat(
       String userId, String title, String body, String chatRoomId) async {
     final url = Uri.parse('$baseUrl/send-notification');
 
@@ -278,6 +279,38 @@ class NotificationService {
 
     final notificationRequest = NotificationRequest(
         userId: userId, title: title, body: body, chatRoomId: chatRoomId);
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Bearer $accessToken', // Ganti dengan token akses yang valid
+        },
+        body: json.encode(notificationRequest.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        print('Notifikasi berhasil dikirim');
+      } else {
+        print('Gagal mengirim notifikasi: ${response.body}');
+      }
+    } catch (e) {
+      print('Error saat mengirim notifikasi: $e');
+    }
+  }
+
+  Future<void> sendNotificationPengaduan(
+      String adminId, String title, String body) async {
+    final url = Uri.parse('$baseUrl/send-notification');
+
+    // Ambil access token dari SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accesToken');
+
+    final notificationRequest =
+        NotificationRequest(userId: adminId, title: title, body: body);
 
     try {
       final response = await http.post(

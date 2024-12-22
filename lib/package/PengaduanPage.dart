@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,6 +12,7 @@ import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/InputUserDetails.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
+import 'package:ssh_aplication/services/NotificatioonService.dart';
 
 class MultiPageForm extends StatefulWidget {
   @override
@@ -31,6 +33,7 @@ class _MultiPageFormState extends State<MultiPageForm> {
       TextEditingController(); // Controller untuk NIK
 
   TextEditingController _namaController = TextEditingController();
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
@@ -186,7 +189,7 @@ class _MultiPageFormState extends State<MultiPageForm> {
 
       // Format tanggal
       String formattedDateTimeKekerasan =
-          _selectedDateKekerasan.toIso8601String();
+          _selectedDateKekerasan!.toIso8601String();
       String formattedDateTimeTanggalLahir =
           _selectedDateTanggalLahir!.toIso8601String();
 
@@ -198,51 +201,66 @@ class _MultiPageFormState extends State<MultiPageForm> {
         try {
           // Dekode token untuk mendapatkan ID pengguna
           var payload = JwtDecoder.decode(accessToken);
-          this.id =
-              payload['sub'].split(',')[0].toString(); // Ambil ID pengguna
-
-          print('ID pengguna: ${this.id}'); // Debug print untuk ID pengguna
+          String id = payload['sub'].split(',')[0].toString();
 
           // Memastikan id tidak kosong
-          if (this.id.isNotEmpty) {
+          if (id.isNotEmpty) {
             _deskripsi = _deskripsiController.text;
 
-            // Simpan gambar ke penyimpanan lokal
-            String? imagePath;
+            // Mengirimkan permintaan POST dengan multipart
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('http://10.0.2.2:8080/pengaduan/create'),
+            );
+
+            request.headers.addAll({
+              'Authorization': 'Bearer $accessToken',
+            });
+
+            // Menambahkan field lainnya
+            request.fields['userId'] = id;
+            request.fields['nik_user'] = _nik!;
+            request.fields['name'] = _nama!;
+            request.fields['jenis_kelamin'] = _jenisKelamin!;
+            request.fields['tempat_lahir'] = _tempatLahir!;
+            request.fields['tanggal_lahir'] = formattedDateTimeTanggalLahir;
+            request.fields['pekerjaan'] = _pekerjaan!;
+            request.fields['status'] = 'Validation';
+            request.fields['status_pelapor'] = _statuspelapor!;
+            request.fields['jenis_kekerasan'] = _jeniskekerasan!;
+            request.fields['deskripsi_kekerasan'] = _deskripsi!;
+            request.fields['tanggal_kekerasan'] = formattedDateTimeKekerasan;
+
+            // Menambahkan file gambar
             if (_selectedImage != null) {
-              imagePath = await saveImageToDirectory(_selectedImage!);
+              String? imagePath = await saveImageToDirectory(_selectedImage!);
+              request.files.add(await http.MultipartFile.fromPath(
+                'bukti_kekerasan',
+                imagePath!,
+                contentType: MediaType(
+                    'image', 'jpeg'), // Sesuaikan dengan tipe file Anda
+              ));
             } else {
               print('Gambar tidak dipilih');
             }
 
-            // Mengirimkan permintaan POST
-            final response = await http.post(
-              Uri.parse('http://10.0.2.2:8080/pengaduan/create'),
-              headers: <String, String>{
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $accessToken',
-              },
-              body: jsonEncode(<String, dynamic>{
-                'userId': this.id, // Pastikan ini bukan null
-                'nik_user': _nik,
-                'name': _nama,
-                'jenis_kelamin': _jenisKelamin,
-                'tempat_lahir': _tempatLahir,
-                'tanggal_lahir': formattedDateTimeTanggalLahir,
-                'pekerjaan': _pekerjaan,
-                'status': 'Validation',
-                'status_pelapor': _statuspelapor,
-                'jenis_kekerasan': _jeniskekerasan,
-                'deskripsi_kekerasan': _deskripsi,
-                'tanggal_kekerasan': formattedDateTimeKekerasan,
-                'bukti_kekerasan': imagePath,
-              }),
-            );
+            // Mengirimkan permintaan
+            var response = await request.send();
 
             if (response.statusCode == 200) {
               print('Pengaduan berhasil disimpan.');
+              // Kirim notifikasi ke pengguna lain
+              String receiverId =
+                  '8'; // Ganti dengan ID pengguna yang akan menerima notifikasi
+              String senderName = _nama;
+              print(_nama);
 
-              // Menampilkan dialog sukses
+              await _notificationService.sendNotificationPengaduan(
+                receiverId,
+                'Laporan dari $senderName',
+                'Pengaduan Kekerasan $_jeniskekerasan',
+              );
+              // Tampilkan dialog sukses
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -263,9 +281,7 @@ class _MultiPageFormState extends State<MultiPageForm> {
                 },
               );
             } else {
-              print(
-                  'Error saving event: ${response.statusCode} - ${response.body}');
-              print('Payload: $payload');
+              print('Error saving event: ${response.statusCode}');
             }
           } else {
             print('ID pengguna tidak ditemukan dalam token');

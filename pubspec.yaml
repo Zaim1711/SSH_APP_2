@@ -51,6 +51,9 @@ dependencies:
   app_settings: ^5.1.1
   provider: ^6.1.2
   firebase_storage: ^12.3.6
+  http_parser: ^4.0.2
+  geolocator: ^13.0.2
+  permission_handler: ^11.3.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

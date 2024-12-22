@@ -191,7 +191,7 @@ class _ChatscreenState extends State<Chatscreen> {
         String chatRoomId = widget.roomId;
         print(userName);
 
-        _notificationService.sendNotification(
+        _notificationService.sendNotificationChat(
           receiverId,
           senderName,
           messageContent,

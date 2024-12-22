@@ -1,17 +1,20 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/package/EventDetailPage.dart';
 import 'package:ssh_aplication/package/LandingPageChat.dart';
+import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
-import 'package:ssh_aplication/package/TestMultiPage.dart';
+import 'package:ssh_aplication/services/LocationService.dart';
 import 'package:ssh_aplication/services/NotificatioonService.dart';
+import 'package:ssh_aplication/services/WebSocketConfig.dart';
 
 class DasboardPage extends StatefulWidget {
   @override
@@ -25,28 +28,40 @@ class _DasboardPageState extends State<DasboardPage> {
   String userName = '';
   String userId = '';
   NotificationService notificationService = NotificationService();
+  late WebSocketService webSocketService;
+  late LocationService locationService;
 
   @override
   void initState() {
     super.initState();
     decodeToken();
     notificationService.requestNotificationPermission();
+    _requestLocationPermission();
     notificationService.init();
     notificationService.configureFCM();
     notificationService.getDeviceToken().then((value) {
       print('device token');
     });
+    webSocketService = WebSocketService();
+    locationService = LocationService(webSocketService);
   }
 
-  Future<File?> getImageFromLocalStorage(String eventImage) async {
-    String imagePath = eventImage;
-    print('Image Path: $imagePath');
-    File imageFile = File(imagePath);
+  @override
+  void dispose() {
+    locationService.stopSendingLocation();
+    webSocketService.close();
+    super.dispose();
+  }
 
-    if (imageFile.existsSync()) {
-      return imageFile;
-    } else {
-      return null;
+  Future<void> _requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.request();
+    if (status.isGranted) {
+      print("Location permission granted.");
+    } else if (status.isDenied) {
+      print("Location permission denied.");
+    } else if (status.isPermanentlyDenied) {
+      print("Location permission permanently denied.");
+      // Mungkin arahkan pengguna ke pengaturan aplikasi untuk mengaktifkan izin.
     }
   }
 
@@ -69,21 +84,41 @@ class _DasboardPageState extends State<DasboardPage> {
     }
   }
 
-  // Fungsi untuk mengambil data produk dari API
-  _loadDataLaporan(String userId, String accessToken) async {
+  void _loadDataLaporan(String userId, String accessToken) async {
     final response = await http.get(
       Uri.parse('http://10.0.2.2:8080/pengaduan/user/$userId'),
       headers: {
-        'Authorization':
-            'Bearer $accessToken', // Menambahkan Authorization header
+        'Authorization': 'Bearer $accessToken',
       },
     );
+
     if (response.statusCode == 200) {
       setState(() {
         ongoingEvents = json.decode(response.body);
       });
     } else {
       print('Gagal mengambil data laporan : ${response.statusCode}');
+    }
+  }
+
+  Future<Uint8List?> fetchImage(String imageName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accesToken');
+    final imageUrl =
+        'http://10.0.2.2:8080/pengaduan/image/$imageName'; // URL gambar
+    final response = await http.get(
+      Uri.parse(imageUrl),
+      headers: {
+        'Authorization':
+            'Bearer $accessToken', // Menambahkan token JWT ke header
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return response.bodyBytes; // Mengembalikan byte gambar
+    } else {
+      print('Gagal mengambil gambar: ${response.statusCode}'); // Debugging
+      return null; // Mengembalikan null jika gagal
     }
   }
 
@@ -113,7 +148,7 @@ class _DasboardPageState extends State<DasboardPage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  DasboardPage()), // Make sure this is the correct navigation logic
+                  DasboardPage()), // Pastikan ini adalah logika navigasi yang benar
         );
       }
 
@@ -122,7 +157,7 @@ class _DasboardPageState extends State<DasboardPage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  ProfilePage()), // Make sure this is the correct navigation logic
+                  ProfilePage()), // Pastikan ini adalah logika navigasi yang benar
         );
       }
       if (index == 0) {
@@ -130,7 +165,7 @@ class _DasboardPageState extends State<DasboardPage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  MultiPageForm()), // Make sure this is the correct navigation logic
+                  MultiPageForm()), // Pastikan ini adalah logika navigasi yang benar
         );
       }
     });
@@ -387,34 +422,34 @@ class _DasboardPageState extends State<DasboardPage> {
                         Positioned(
                           left: 7,
                           top: 6,
-                          child: Container(
-                            width: 71,
-                            height: 71,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: FutureBuilder<File?>(
-                              future: laporan['bukti_kekerasan'] != null
-                                  ? getImageFromLocalStorage(
-                                      laporan['bukti_kekerasan'])
-                                  : null,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else if (snapshot.hasData &&
-                                    snapshot.data != null) {
-                                  return Image.file(
-                                    snapshot.data!,
-                                    fit: BoxFit.cover,
-                                  );
-                                } else {
-                                  return Container(); // Empty container if image is not found
-                                }
-                              },
-                            ),
+                          child: FutureBuilder<Uint8List?>(
+                            future: fetchImage(
+                                laporan['bukti_kekerasan']), // Ambil gambar
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Container(
+                                  width: 71,
+                                  height: 71,
+                                  child: Center(
+                                      child: CircularProgressIndicator()),
+                                );
+                              } else if (snapshot.hasError ||
+                                  snapshot.data == null) {
+                                return Icon(Icons
+                                    .image_not_supported); // Menampilkan ikon jika gambar tidak ditemukan
+                              } else {
+                                return Container(
+                                  width: 71,
+                                  height: 71,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Image.memory(snapshot.data!,
+                                      fit: BoxFit.cover),
+                                );
+                              }
+                            },
                           ),
                         ),
                         Positioned(
@@ -436,7 +471,13 @@ class _DasboardPageState extends State<DasboardPage> {
                   ),
                 );
               }).toList(),
-            )
+            ),
+            ElevatedButton(
+              onPressed: () {
+                locationService.startSendingLocation();
+              },
+              child: Text('Start Tracking'),
+            ),
           ],
         ),
       ),
