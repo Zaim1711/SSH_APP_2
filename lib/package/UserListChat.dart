@@ -7,11 +7,10 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/userModel.dart';
 import 'package:ssh_aplication/package/ChatScreen.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 import 'package:ssh_aplication/services/UserService.dart' as user_service;
 
 class UserService {
-  final String baseUrl = 'http://10.0.2.2:8080/users';
-
   Future<List<User>> fetchUsers() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
@@ -21,7 +20,7 @@ class UserService {
     }
 
     final response = await http.get(
-      Uri.parse(baseUrl),
+      Uri.parse(ApiConfig.saveUser),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -90,7 +89,7 @@ class _UserListChatState extends State<UserListChat> {
       return;
     }
 
-    final url = Uri.parse('http://10.0.2.2:8080/api/chatrooms');
+    final url = Uri.parse(ApiConfig.createRoom);
     final response = await http.post(url,
         headers: {
           'Content-Type': 'application/json',

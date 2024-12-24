@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class Service {
   Future<http.Response> saveUser(
       String username, String email, String password) async {
-    var uri = Uri.parse("http://10.0.2.2:8080/users");
+    var uri = Uri.parse(ApiConfig.saveUser);
 
     Map<String, String> headers = {"Content-Type": "application/json"};
 

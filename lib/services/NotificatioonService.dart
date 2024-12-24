@@ -12,12 +12,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/main.dart';
 import 'package:ssh_aplication/model/NotificationRequest.dart';
 import 'package:ssh_aplication/package/LandingPageChat.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
-  final String baseUrl = 'http://10.0.2.2:8080/api/tokens';
   StreamSubscription? _messageSubscription;
 
   Future<void> init() async {
@@ -208,16 +207,13 @@ class NotificationService {
   }
 
   Future<void> sendTokenToServer(String deviceToken, String userId) async {
-    final url =
-        'http://10.0.2.2:8080/api/tokens'; // Ganti dengan URL endpoint Anda
-
     // Ambil access token dari SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
 
     try {
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse(ApiConfig.notificationService),
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
@@ -271,7 +267,7 @@ class NotificationService {
 
   Future<void> sendNotificationChat(
       String userId, String title, String body, String chatRoomId) async {
-    final url = Uri.parse('$baseUrl/send-notification');
+    final url = Uri.parse(ApiConfig.notificationServiceSend);
 
     // Ambil access token dari SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -303,7 +299,7 @@ class NotificationService {
 
   Future<void> sendNotificationPengaduan(
       String adminId, String title, String body) async {
-    final url = Uri.parse('$baseUrl/send-notification');
+    final url = Uri.parse(ApiConfig.notificationServiceSend);
 
     // Ambil access token dari SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -3,11 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/chatRoom.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class ChatRoomService {
-  final String baseUrl =
-      'http://10.0.2.2:8080/api/chatrooms'; // Ganti dengan URL API Anda
-
   Future<List<ChatRoom>> fetchChatRoomsBySender(String senderId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
@@ -17,7 +15,7 @@ class ChatRoomService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/sender/$senderId'),
+      Uri.parse(ApiConfig.fetchChatRoomsBySender(senderId)),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -45,7 +43,7 @@ class ChatRoomService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/receiver/$receiverId'),
+      Uri.parse(ApiConfig.fetchChatRoomsByReceiver(receiverId)),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

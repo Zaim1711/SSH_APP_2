@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/UserDetailsPage.dart'; // Pastikan Anda mengimpor DashboardPage
+import 'package:ssh_aplication/package/UserDetailsPage.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart'; // Pastikan Anda mengimpor DashboardPage
 
 class InputUserDetails extends StatefulWidget {
   const InputUserDetails({Key? key}) : super(key: key);
@@ -43,11 +44,9 @@ class _InputUserDetailsState extends State<InputUserDetails> {
     Map<String, dynamic> payload = JwtDecoder.decode(accessToken);
     String userId = payload['sub'].split(',')[0];
 
-    const String baseUrl = "http://10.0.2.2:8080/details/user"; // URL backend
-
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/$userId'),
+        Uri.parse(ApiConfig.getdetailsUser(userId)),
         headers: {
           'Authorization': 'Bearer $accessToken',
         },

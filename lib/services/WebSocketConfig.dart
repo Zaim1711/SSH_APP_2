@@ -1,16 +1,11 @@
+import 'package:ssh_aplication/services/ApiConfig.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class WebSocketService {
   final WebSocketChannel channel;
 
-  // URL WebSocket langsung ditulis di sini
-  static const String webSocketUrl = "ws://10.0.2.2:8080/location";
-
   WebSocketService()
-      : channel = WebSocketChannel.connect(Uri.parse(webSocketUrl)) {
-    print(
-        "WebSocket URL: $webSocketUrl"); // Menambahkan print untuk mencetak URL
-
+      : channel = WebSocketChannel.connect(Uri.parse(ApiConfig.webSokcetUrl)) {
     channel.stream.listen((message) {
       print("Received message: $message");
     }, onDone: () {

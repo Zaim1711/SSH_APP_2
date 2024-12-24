@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/InformasiHakdanHukum.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class InformationPage extends StatefulWidget {
   @override
@@ -28,8 +29,7 @@ class _InformationPageState extends State<InformationPage> {
 
     // Mengirimkan permintaan GET dengan header Authorization
     final response = await http.get(
-      Uri.parse(
-          'http://10.0.2.2:8080/informasiHakHukum'), // Ganti dengan URL yang sesuai
+      Uri.parse(ApiConfig.fetchInformation), // Ganti dengan URL yang sesuai
       headers: {
         'Authorization':
             'Bearer $accessToken', // Menambahkan Authorization header

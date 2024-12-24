@@ -6,6 +6,7 @@ import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
 import 'package:ssh_aplication/package/TestInfromasiPage.dart';
 import 'package:ssh_aplication/package/UserListChat.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Map<String, dynamic> laporan;
@@ -106,7 +107,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(30),
                       child: Image.network(
-                        'http://10.0.2.2:8080/pengaduan/image/${widget.imagePath}', // Menggunakan URL
+                        ApiConfig.getFetchImage(
+                            widget.imagePath), // Menggunakan URL
                         width: double.infinity,
                         height: 250,
                         fit: BoxFit.cover,

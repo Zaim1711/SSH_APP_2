@@ -10,6 +10,7 @@ import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/EditProfilePage.dart';
 import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class UserDetailsPage extends StatefulWidget {
   const UserDetailsPage({super.key});
@@ -33,7 +34,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     String userId = payload['sub'].split(',')[0];
 
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8080/details/user/$userId'),
+      Uri.parse(ApiConfig.getcheckUserUrl(userId)),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },

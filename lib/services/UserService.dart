@@ -4,11 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/userModel.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class UserService {
-  final String baseUrl =
-      'http://10.0.2.2:8080/users'; // Update with your API URL
-
   Future<User> fetchUser(String receiverId) async {
     // Retrieve the access token from shared preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -17,7 +15,7 @@ class UserService {
 
     // Make the GET request to fetch the user
     final response = await http.get(
-      Uri.parse('$baseUrl/$receiverId'),
+      Uri.parse(ApiConfig.getDataUser(receiverId)),
       headers: {
         'Authorization':
             'Bearer $accessToken', // Include the token in the headers

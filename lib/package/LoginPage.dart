@@ -12,12 +12,13 @@ import 'package:ssh_aplication/component/password_TextField.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/SignUpPage.dart';
 import 'package:ssh_aplication/package/user.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   User user = User("", "");
-  String url = "http://10.0.2.2:8080/auth/login";
+  String url = (ApiConfig.loginUrl);
 
   Future<void> save(BuildContext context) async {
     // Validasi input

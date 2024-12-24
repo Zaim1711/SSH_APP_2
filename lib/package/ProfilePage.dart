@@ -12,6 +12,7 @@ import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/LoginPage.dart';
 import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/UserDetailsPage.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -39,14 +40,12 @@ class _ProfilePageState extends State<ProfilePage> {
     String? accessToken = prefs.getString('accesToken');
 
     if (accessToken != null) {
-      // Call the API to delete the FCM token
-      String url =
-          'http://10.0.2.2:8080/api/tokens/$userId'; // Adjust the URL as needed
+      // Call the API to delete the FCM toke // Adjust the URL as needed
       Dio dio = Dio();
       dio.options.headers['Authorization'] = 'Bearer $accessToken';
 
       try {
-        await dio.delete(url);
+        await dio.delete(ApiConfig.deleteFcmToken(userId));
         print('FCM token deleted successfully');
       } catch (e) {
         print('Error deleting FCM token: $e');
@@ -117,13 +116,10 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
 
-      // Ganti URL dengan endpoint backend Anda dan tambahkan ID ke URL
-      String url = 'http://10.0.2.2:8080/users/$id';
-
       Dio dio = Dio();
       dio.options.headers['Authorization'] = 'Bearer $accessToken';
 
-      Response response = await dio.get(url);
+      Response response = await dio.get(ApiConfig.getDataUser(id));
 
       Map<String, dynamic> userData = response.data;
       setState(() {

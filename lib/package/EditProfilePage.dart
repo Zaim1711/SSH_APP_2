@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ssh_aplication/model/DetailsUser.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class EditProfilePage extends StatefulWidget {
   final DetailsUser userDetail;
@@ -42,12 +43,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     // ID pengguna bisa didapatkan dari argumen atau penyimpanan lokal
     String userId = id; // Ganti dengan ID pengguna yang sebenarnya
-    const String baseUrl = "http://10.0.2.2:8080/details"; // URL backend
 
     try {
       // Kirim data ke server
       final response = await http.put(
-        Uri.parse('$baseUrl/$userId'),
+        Uri.parse(ApiConfig.getdetailsUser(userId)),
         headers: {
           'Content-Type': 'application/json',
         },

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/services/WebSocketConfig.dart';
 
@@ -9,32 +10,41 @@ class LocationService {
   final WebSocketService webSocketService;
   Map<String, dynamic> payload = {};
   Timer? timer;
+  late Function(LatLng) onLocationUpdate; // Ensure correct function signature
 
-  LocationService(this.webSocketService);
+  LocationService(this.webSocketService, this.onLocationUpdate);
 
-  void startSendingLocation() async {
+  Future<void> startSendingLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
 
-    payload = JwtDecoder.decode(accessToken!);
-    String name = payload['sub'].split(',')[2];
-    String id = payload['sub'].split(',')[0];
-    // Mengambil nilai 'name' dari token JWT
+    if (accessToken != null) {
+      payload = JwtDecoder.decode(accessToken);
+      String name = payload['sub'].split(',')[2];
+      String id = payload['sub'].split(',')[0];
 
-    timer = Timer.periodic(Duration(seconds: 5), (timer) async {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      timer = Timer.periodic(Duration(seconds: 1), (timer) async {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
 
-      String locationData =
-          '{"latitude": ${position.latitude}, "longitude": ${position.longitude}, "userId": "$id"}';
-      webSocketService.sendMessage(locationData);
+        String locationData =
+            '{"latitude": ${position.latitude}, "longitude": ${position.longitude}, "userId": "$id"}';
+        webSocketService.sendMessage(locationData);
 
-      print("Location sent: $locationData");
-    });
+        // Update posisi lokasi di peta
+        onLocationUpdate(LatLng(position.latitude, position.longitude));
+
+        print("Location sent: $locationData");
+      });
+    }
   }
 
-  void stopSendingLocation() {
-    timer?.cancel();
+  Future<void> stopSendingLocation() async {
+    if (timer != null) {
+      timer!.cancel();
+      timer = null;
+      print("Timer stopped.");
+    }
   }
 }

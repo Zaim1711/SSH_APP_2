@@ -12,6 +12,7 @@ import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/InputUserDetails.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
+import 'package:ssh_aplication/services/ApiConfig.dart';
 import 'package:ssh_aplication/services/NotificatioonService.dart';
 
 class MultiPageForm extends StatefulWidget {
@@ -56,12 +57,11 @@ class _MultiPageFormState extends State<MultiPageForm> {
         print('ID pengguna: $id'); // Debug print untuk ID pengguna
 
         final response = await http.get(
-          Uri.parse('http://10.0.2.2:8080/details/user/$id'),
+          Uri.parse(ApiConfig.getcheckUserUrl(id)),
           headers: {
             'Authorization': 'Bearer $accessToken',
           },
         );
-
         if (response.statusCode == 200) {
           var userDetails = jsonDecode(response.body);
           print(response.body);
@@ -210,7 +210,7 @@ class _MultiPageFormState extends State<MultiPageForm> {
             // Mengirimkan permintaan POST dengan multipart
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('http://10.0.2.2:8080/pengaduan/create'),
+              Uri.parse(ApiConfig.cretePengaduan),
             );
 
             request.headers.addAll({
