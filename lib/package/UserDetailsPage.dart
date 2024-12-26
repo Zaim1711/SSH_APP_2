@@ -8,6 +8,7 @@ import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/model/DetailsUser.dart';
 import 'package:ssh_aplication/package/DasboardPage.dart';
 import 'package:ssh_aplication/package/EditProfilePage.dart';
+import 'package:ssh_aplication/package/InputUserDetails.dart';
 import 'package:ssh_aplication/package/PengaduanPage.dart';
 import 'package:ssh_aplication/package/ProfilePage.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
@@ -32,6 +33,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
 
     Map<String, dynamic> payload = JwtDecoder.decode(accessToken);
     String userId = payload['sub'].split(',')[0];
+    print(userId);
 
     final response = await http.get(
       Uri.parse(ApiConfig.getcheckUserUrl(userId)),
@@ -43,10 +45,15 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
     if (response.statusCode == 200) {
       try {
         final jsonResponse = json.decode(response.body);
+        if (jsonResponse.isEmpty) {
+          return null; // Data tidak ditemukan
+        }
         return DetailsUser.fromJson(jsonResponse);
       } catch (e) {
         throw Exception('Failed to parse user details');
       }
+    } else if (response.statusCode == 404) {
+      return null; // Data tidak ditemukan
     } else {
       throw Exception('Failed to load user details: ${response.statusCode}');
     }
@@ -149,12 +156,53 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                     ),
                   );
                 } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text('User  not found',
-                        style: TextStyle(fontSize: 18, color: Colors.grey)),
+                  // Jika data tidak ditemukan
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Belum ada data , masukan data anda ',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            // Navigasi ke halaman Tambah Detail
+                            final bool? isAdded = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    InputUserDetails(), // Halaman Tambah Detail
+                              ),
+                            );
+
+                            // Jika detail berhasil ditambahkan, refresh data
+                            if (isAdded == true) {
+                              setState(() {
+                                fetchUserDetails();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          label: const Text('Tambah Detail',
+                              style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                            textStyle: const TextStyle(fontSize: 16),
+                            backgroundColor: const Color(0xFF0E197E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 }
 
+                // Jika data ditemukan, tampilkan detail pengguna
                 DetailsUser userDetail = snapshot.data!;
 
                 return Padding(
@@ -177,13 +225,11 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                       color: Color(0xFF0E197E), size: 40),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'User  Details',
+                                    'User Details',
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        ?.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -206,7 +252,7 @@ class _UserDetailsPageState extends State<UserDetailsPage> {
                                 leading: const Icon(Icons.phone,
                                     color: Color(0xFF0E197E)),
                                 title: const Text('Nomor Telepon'),
-                                subtitle: Text(userDetail.nomorTelepon,
+                                subtitle: Text("0" + userDetail.nomorTelepon,
                                     style: const TextStyle(fontSize: 16)),
                               ),
                             ],

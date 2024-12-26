@@ -78,11 +78,9 @@ class _InputUserDetailsState extends State<InputUserDetails> {
     Map<String, dynamic> payload = JwtDecoder.decode(accessToken);
     String userId = payload['sub'].split(',')[0];
 
-    const String baseUrl = "http://10.0.2.2:8080/details"; // URL backend
-
     try {
       final response = await http.post(
-        Uri.parse(baseUrl),
+        Uri.parse(ApiConfig.detailsUser),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -97,7 +95,7 @@ class _InputUserDetailsState extends State<InputUserDetails> {
       if (response.statusCode == 201) {
         print('Profile Berhasil disimpan');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+          const SnackBar(content: Text('Profile Berhasil Disimpan')),
         );
         Navigator.push(
             context,
@@ -136,9 +134,13 @@ class _InputUserDetailsState extends State<InputUserDetails> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Edit Profile'),
+          title: const Text(
+            'Detail Pengguna',
+            style: TextStyle(color: Colors.white),
+          ),
           centerTitle: true,
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: const Color(0xFF0E197E),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -175,7 +177,7 @@ class _InputUserDetailsState extends State<InputUserDetails> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   textStyle: const TextStyle(fontSize: 16),
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: const Color(0xFF0E197E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

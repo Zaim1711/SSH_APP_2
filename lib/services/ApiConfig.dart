@@ -1,13 +1,15 @@
 class ApiConfig {
   // Ganti URL ini sesuai dengan URL API Anda
-  static const String baseUrl = "http://192.168.68.246:8080";
-  static const String websocketBaseUrl = "ws://192.168.68.246:8080/ws";
+  static const String baseUrl = "http://192.168.137.1:8080";
+  static const String websocketBaseUrl = "ws://192.168.137.1:8080/ws";
+  //debug Handphone 192.168.68.246
+  //debug Laptop 10.0.2.2
 
   //  Endpoint API with data
   static String getcheckUserUrl(String id) => "$baseUrl/details/user/$id";
   static String getFetchImage(String imageName) =>
       "$baseUrl/pengaduan/image/$imageName";
-  static String getdetailsUser(id) => "$baseUrl/detail/$id";
+  static String getdetailsUser(id) => "$baseUrl/details/$id";
   static String deleteFcmToken(id) => "$baseUrl/api/tokens/$id";
   static String getDataUser(id) => "$baseUrl/users/$id";
   static String fetchChatRoomsBySender(id) =>
@@ -28,6 +30,6 @@ class ApiConfig {
   static String get notificationService => "$baseUrl/api/tokens";
   static String get notificationServiceSend =>
       "$baseUrl/api/tokens/send-notification";
-  static String get webSokcetUrl => "$webSokcetUrl";
   static String get fetchUser => "$baseUrl/users";
+  static String get detailsUser => "$baseUrl/details";
 }

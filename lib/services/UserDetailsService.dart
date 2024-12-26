@@ -6,7 +6,7 @@ import 'package:ssh_aplication/services/ApiConfig.dart'; // Import model Details
 
 class DetailsUserService {
   Future<DetailsUser?> getDetailsUser(String id) async {
-    final response = await http.get(Uri.parse(ApiConfig.getdetailsUser(id)));
+    final response = await http.get(Uri.parse(ApiConfig.getcheckUserUrl(id)));
 
     if (response.statusCode == 200) {
       return DetailsUser.fromJson(json.decode(response.body));

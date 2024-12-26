@@ -10,6 +10,9 @@
         android:label="ssh_aplication"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+                android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyDrnTKv-teAVFc7MuqcPEtX1Mu1YUz4Ojc"/>
 
         <!-- Receiver untuk ScheduledNotificationReceiver -->
         <receiver
@@ -55,9 +58,6 @@
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="your_channel_id" />
-            <meta-data
-                android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDrnTKv-teAVFc7MuqcPEtX1Mu1YUz4Ojc"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

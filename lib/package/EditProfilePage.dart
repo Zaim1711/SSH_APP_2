@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/DetailsUser.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
@@ -40,16 +41,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final String alamat = _alamatController.text;
     final String nomorTelepon = _nomorTeleponController.text;
     final String id = widget.userDetail.id.toString();
-
-    // ID pengguna bisa didapatkan dari argumen atau penyimpanan lokal
-    String userId = id; // Ganti dengan ID pengguna yang sebenarnya
+    print(id);
 
     try {
+      // Ambil accessToken dari SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final String? accessToken = prefs.getString('accesToken');
+
+      if (accessToken == null) {
+        // Jika accessToken tidak ada, tampilkan pesan error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Access token not found')),
+        );
+        return;
+      }
+
       // Kirim data ke server
       final response = await http.put(
-        Uri.parse(ApiConfig.getdetailsUser(userId)),
+        Uri.parse(ApiConfig.getdetailsUser(id)),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
         },
         body: json.encode({
           'nik': nik,
@@ -61,21 +73,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // Periksa respons
       if (response.statusCode == 200) {
         print('Profile updated successfully');
-        // Tampilkan pesan sukses (opsional)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
         Navigator.pop(context, true); // Kembali ke halaman sebelumnya
       } else {
         print('Failed to update profile: ${response.statusCode}');
-        // Tampilkan pesan error
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update profile')),
         );
       }
     } catch (e) {
       print('Error: $e');
-      // Tampilkan pesan error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An error occurred')),
       );

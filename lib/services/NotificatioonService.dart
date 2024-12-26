@@ -15,76 +15,68 @@ import 'package:ssh_aplication/package/LandingPageChat.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   StreamSubscription? _messageSubscription;
 
   Future<void> init() async {
+    // Inisialisasi notifikasi
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
 
-    // Inisialisasi notifikasi
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: onSelectNotification);
+    await _flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: onSelectNotification,
+    );
 
     // Membuat saluran notifikasi
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'your_channel_id', // ID saluran
-      'Your Channel Name', // Nama saluran
+      'your_channel_id',
+      'Your Channel Name',
       description: 'Your channel description',
       importance: Importance.high,
     );
 
-    // Buat saluran (akan menimpa jika sudah ada)
-    await flutterLocalNotificationsPlugin
+    await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
   }
 
   Future<void> showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'your_channel_id', // Pastikan ini cocok dengan ID saluran Anda
-      'Your Channel Name', // Nama saluran
-      channelDescription: 'Your channel description', // Deskripsi saluran
+      'your_channel_id',
+      'Your Channel Name',
+      channelDescription: 'Your channel description',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false,
-      icon: '@mipmap/ic_launcher', // Gunakan ikon kecil Anda di sini
+      showWhen: true,
+      icon: '@mipmap/ic_launcher',
     );
 
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
 
-    await flutterLocalNotificationsPlugin.show(
-      DateTime.now()
-          .millisecondsSinceEpoch
-          .remainder(100000), // ID unik untuk setiap notifikasi
-      title, // Judul notifikasi
-      body, // Isi notifikasi
-      platformChannelSpecifics,
-      payload: 'item x', // Anda dapat menyesuaikan payload ini sesuai kebutuhan
+    await _flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      platformDetails,
+      payload: 'default',
     );
   }
 
   Future<void> onSelectNotification(NotificationResponse response) async {
-    // Ambil BuildContext dari global key atau state management
-    final context = navigatorKey
-        .currentContext; // Misalkan Anda menggunakan GlobalKey<NavigatorState>
+    final context = navigatorKey.currentContext;
 
     if (context != null) {
-      // Tangani logika ketika notifikasi ditekan
-      print('Payload notifikasi: ${response.payload}');
-
-      // Jika Anda ingin membuka UserListChat tanpa menggunakan payload
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) =>
-              LandingPageChatRooms(), // Ganti ini dengan halaman yang ingin Anda buka
+          builder: (context) => LandingPageChatRooms(),
         ),
       );
     } else {
@@ -94,64 +86,37 @@ class NotificationService {
 
   void configureFCM() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Menerima pesan di latar depan: ${message.messageId}");
-
-      // Periksa apakah payload notifikasi ada
       if (message.notification != null) {
-        // Tampilkan notifikasi menggunakan judul dan isi notifikasi
         showNotification(
           message.notification!.title ?? 'Tanpa Judul',
           message.notification!.body ?? 'Tanpa Isi',
         );
       }
 
-      // Periksa apakah payload data ada
       if (message.data.isNotEmpty) {
         String senderId = message.data['senderId'] ?? 'Pengirim Tidak Dikenal';
         String messageContent =
             message.data['messageContent'] ?? 'Tanpa Konten';
 
-        // Opsional, tampilkan notifikasi untuk pesan data juga
         showNotification('Pesan Baru dari $senderId', messageContent);
       }
     });
   }
 
-  static Future<void> _firebaseMessagingBackgroundHandler(
+  static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print("Menangani pesan latar belakang: ${message.messageId}");
-
-    // Periksa apakah payload notifikasi ada
     if (message.notification != null) {
-      // Tampilkan notifikasi saat aplikasi berada di latar belakang
       final service = NotificationService();
       await service.showNotification(
         message.notification!.title ?? 'Tanpa Judul',
         message.notification!.body ?? 'Tanpa Isi',
       );
-    } else {
-      // Tangani kasus di mana payload notifikasi null
-      print('Payload notifikasi latar belakang adalah null');
-    }
-
-    // Jika ada data tambahan
-    if (message.data.isNotEmpty) {
-      String chatRoomId = message.data['roomId'] ?? '';
-      String senderId = message.data['senderId'] ?? '';
-      String messageContent = message.data['messageContent'] ?? '';
-
-      // Tampilkan notifikasi dengan informasi tambahan
-      final service = NotificationService();
-      await service.showNotification(
-          'Pesan Baru dari $senderId', // Judul notifikasi
-          messageContent // Isi notifikasi
-          );
     }
   }
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  void requestNotificationPermission() async {
+  Future<void> requestNotificationPermission() async {
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       announcement: true,
@@ -169,17 +134,13 @@ class NotificationService {
       print('Pengguna memberikan izin sementara');
     } else {
       AppSettings.openAppSettings();
-      print('Pengguna menolak atau belum memberikan izin');
     }
   }
 
   Future<void> getDeviceToken() async {
     try {
-      // Mendapatkan token perangkat
       String? deviceToken = await messaging.getToken();
-      print(deviceToken);
       if (deviceToken != null) {
-        // Mendapatkan ID pengguna dari token akses
         await decodeTokenAndSendToServer(deviceToken);
       } else {
         print('Token perangkat tidak ditemukan');
@@ -194,20 +155,13 @@ class NotificationService {
     String? accessToken = prefs.getString('accesToken');
 
     if (accessToken != null) {
-      // Mendekode token JWT
       Map<String, dynamic> payload = JwtDecoder.decode(accessToken);
       String userId = payload['sub'].split(',')[0];
-      print(userId);
-
-      // Mengirim token ke server
       await sendTokenToServer(deviceToken, userId);
-    } else {
-      print('Access token tidak ditemukan');
     }
   }
 
   Future<void> sendTokenToServer(String deviceToken, String userId) async {
-    // Ambil access token dari SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
 
@@ -216,12 +170,11 @@ class NotificationService {
         Uri.parse(ApiConfig.notificationService),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer $accessToken', // Menambahkan JWT token ke header
+          'Authorization': 'Bearer $accessToken',
         },
         body: json.encode({
           'token': deviceToken,
-          'userId': userId, // Kirim userId ke server
+          'userId': userId,
         }),
       );
 
@@ -235,13 +188,6 @@ class NotificationService {
     }
   }
 
-  void isTokenRefresh() async {
-    messaging.onTokenRefresh.listen((event) {
-      print('Token diperbarui: $event');
-    }); // Mendengarkan token refresh
-  }
-
-  // Method untuk mendengarkan pesan
   void listenForMessages(String roomId, String senderId) {
     _messageSubscription = FirebaseFirestore.instance
         .collection('chatrooms')
@@ -256,7 +202,6 @@ class NotificationService {
           String messageContent = data['messageContent'];
           String messageSenderId = data['senderId'];
 
-          // Beri tahu bagian lain dari aplikasi (Anda dapat menggunakan callback atau stream)
           if (messageSenderId != senderId) {
             showNotification('Pesan Baru', messageContent);
           }
@@ -269,20 +214,22 @@ class NotificationService {
       String userId, String title, String body, String chatRoomId) async {
     final url = Uri.parse(ApiConfig.notificationServiceSend);
 
-    // Ambil access token dari SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accesToken');
 
     final notificationRequest = NotificationRequest(
-        userId: userId, title: title, body: body, chatRoomId: chatRoomId);
+      userId: userId,
+      title: title,
+      body: body,
+      chatRoomId: chatRoomId,
+    );
 
     try {
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer $accessToken', // Ganti dengan token akses yang valid
+          'Authorization': 'Bearer $accessToken',
         },
         body: json.encode(notificationRequest.toJson()),
       );

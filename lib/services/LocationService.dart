@@ -11,8 +11,10 @@ class LocationService {
   Map<String, dynamic> payload = {};
   Timer? timer;
   late Function(LatLng) onLocationUpdate; // Ensure correct function signature
+  StreamController<LatLng> _locationController = StreamController<LatLng>();
 
   LocationService(this.webSocketService, this.onLocationUpdate);
+  Stream<LatLng> get locationStream => _locationController.stream;
 
   Future<void> startSendingLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -5,7 +5,8 @@ class WebSocketService {
   final WebSocketChannel channel;
 
   WebSocketService()
-      : channel = WebSocketChannel.connect(Uri.parse(ApiConfig.webSokcetUrl)) {
+      : channel =
+            WebSocketChannel.connect(Uri.parse(ApiConfig.websocketBaseUrl)) {
     channel.stream.listen((message) {
       print("Received message: $message");
     }, onDone: () {

@@ -54,8 +54,6 @@ class _MultiPageFormState extends State<MultiPageForm> {
         String nama =
             payload['sub'].split(',')[2].toString(); // Ambil ID pengguna
 
-        print('ID pengguna: $id'); // Debug print untuk ID pengguna
-
         final response = await http.get(
           Uri.parse(ApiConfig.getcheckUserUrl(id)),
           headers: {
@@ -71,7 +69,6 @@ class _MultiPageFormState extends State<MultiPageForm> {
             _nikController.text = nik; // Mengatur nilai controller
             _namaController.text = nama;
           });
-          print(nik);
 
           if (userDetails.isEmpty) {
             _showDataNotFoundDialog();

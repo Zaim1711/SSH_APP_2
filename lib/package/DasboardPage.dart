@@ -33,13 +33,13 @@ class _DasboardPageState extends State<DasboardPage> {
   void initState() {
     super.initState();
     decodeToken();
-    _requestLocationPermission();
     notificationService.requestNotificationPermission();
     notificationService.init();
     notificationService.configureFCM();
     notificationService.getDeviceToken().then((value) {
       print('device token');
     });
+    _requestLocationPermission();
   }
 
   @override
