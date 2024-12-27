@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
@@ -7,6 +8,7 @@ import 'package:ssh_aplication/package/ProfilePage.dart';
 import 'package:ssh_aplication/package/TestInfromasiPage.dart';
 import 'package:ssh_aplication/package/UserListChat.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
+import 'package:video_player/video_player.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Map<String, dynamic> laporan;
@@ -20,11 +22,37 @@ class EventDetailPage extends StatefulWidget {
 
 class _EventDetailPageState extends State<EventDetailPage> {
   int _currentIndex = 2;
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
 
   String formatIsoDateToNormal(String isoDate) {
     DateTime dateTime = DateTime.parse(isoDate);
     final DateFormat formatter = DateFormat('dd MMMM yyyy', 'id_ID');
     return formatter.format(dateTime);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Cek apakah bukti kekerasan adalah video
+    if (widget.imagePath.isNotEmpty && widget.imagePath.endsWith('.mp4')) {
+      _videoController = VideoPlayerController.network(
+        ApiConfig.getFetchImage(widget.imagePath),
+      );
+
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController!,
+        autoPlay: false,
+        looping: false,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose(); // Membersihkan controller video
+    _chewieController?.dispose(); // Membersihkan controller Chewie
+    super.dispose();
   }
 
   void _onItemTapped(int index) {
@@ -103,20 +131,28 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 ),
                 child: Column(
                   children: [
-                    // Gambar laporan
+                    // Gambar atau video laporan
                     ClipRRect(
                       borderRadius: BorderRadius.circular(30),
-                      child: Image.network(
-                        ApiConfig.getFetchImage(
-                            widget.imagePath), // Menggunakan URL
-                        width: double.infinity,
-                        height: 250,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(child: Text('Gambar tidak tersedia'));
-                        },
-                      ),
+                      child: widget.imagePath.endsWith('.mp4')
+                          ? AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Chewie(
+                                controller: _chewieController!,
+                              ),
+                            )
+                          : Image.network(
+                              ApiConfig.getFetchImage(widget.imagePath),
+                              width: double.infinity,
+                              height: 250,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                    child: Text('Gambar tidak tersedia'));
+                              },
+                            ),
                     ),
+
                     const SizedBox(height: 10), // Jarak antara gambar dan teks
 
                     // Informasi laporan
@@ -125,27 +161,69 @@ class _EventDetailPageState extends State<EventDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                '${widget.laporan['name']}',
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
                           Text(
-                            '${widget.laporan['name']}',
+                            'NIK : ${widget.laporan['nik_user']}',
                             style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                                fontSize: 16, color: Colors.white),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Status Pelapor: ${widget.laporan['status_pelapor']}',
+                            'Jenis Kelamin : ${widget.laporan['jenis_kelamin']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tanggal Lahir : ${formatIsoDateToNormal(widget.laporan['tanggal_lahir'])}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Status Pelapor : ${widget.laporan['status_pelapor']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tempat Lahir : ${widget.laporan['tempat_lahir']}',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Deskripsi Kekerasan : ${widget.laporan['deskripsi_kekerasan']}',
                             style: const TextStyle(
                                 fontSize: 16, color: Colors.white),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Tanggal Kekerasan: ${formatIsoDateToNormal(widget.laporan['tanggal_kekerasan'])}',
+                            'Tanggal Kekerasan : ${formatIsoDateToNormal(widget.laporan['tanggal_kekerasan'])}',
                             style: const TextStyle(
                                 fontSize: 16, color: Colors.white),
                           ),
+                          const SizedBox(height: 8),
                           Text(
-                            'Status: $status',
+                            'Status : $status',
                             style: const TextStyle(
                                 fontSize: 16, color: Colors.white),
                           ),
