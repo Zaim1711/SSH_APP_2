@@ -6,11 +6,11 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
 import 'package:ssh_aplication/model/DetailsUser.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/EditProfilePage.dart';
-import 'package:ssh_aplication/package/InputUserDetails.dart';
-import 'package:ssh_aplication/package/PengaduanPage.dart';
-import 'package:ssh_aplication/package/ProfilePage.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/EditProfilePage.dart';
+import 'package:ssh_aplication/package/UserPage/InputUserDetails.dart';
+import 'package:ssh_aplication/package/UserPage/PengaduanPage.dart';
+import 'package:ssh_aplication/package/UserPage/ProfilePage.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class UserDetailsPage extends StatefulWidget {

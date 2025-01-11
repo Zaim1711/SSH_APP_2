@@ -3,8 +3,8 @@ import 'package:jwt_decoder/jwt_decoder.dart'; // Pastikan Anda memiliki paket i
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/chatRoom.dart';
 import 'package:ssh_aplication/model/userModel.dart';
-import 'package:ssh_aplication/package/ChatScreen.dart'; // Pastikan ini adalah path yang benar
-import 'package:ssh_aplication/package/UserListChat.dart';
+import 'package:ssh_aplication/package/UserPage/ChatScreen.dart'; // Pastikan ini adalah path yang benar
+import 'package:ssh_aplication/package/UserPage/UserListChat.dart';
 import 'package:ssh_aplication/services/ChatRoomService.dart';
 import 'package:ssh_aplication/services/UserService.dart'
     as user_service; // Gunakan alias di sini
@@ -89,8 +89,7 @@ class _LandingPageChatRoomsState extends State<LandingPageChatRooms> {
 
   @override
   Widget build(BuildContext context) {
-    const String defaultProfileImagePath =
-        'lib/image/image.png'; // Path ke gambar default
+    // Path ke gambar default
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat Rooms'),
@@ -144,11 +143,11 @@ class _LandingPageChatRoomsState extends State<LandingPageChatRooms> {
 
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: user.profileImage.isNotEmpty
-                          ? NetworkImage(user
-                              .profileImage) // Gunakan NetworkImage jika URL ada
-                          : AssetImage(defaultProfileImagePath)
-                              as ImageProvider, // Gunakan gambar aset default jika tidak ada
+                      radius: 20,
+                      child: Text(
+                        user.username[0].toUpperCase(),
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     title: Text(user.email ??
                         "Unknown User"), // Tampilkan nama pengguna

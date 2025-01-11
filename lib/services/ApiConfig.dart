@@ -1,7 +1,7 @@
 class ApiConfig {
   // Ganti URL ini sesuai dengan URL API Anda
-  static const String baseUrl = "http://192.168.137.1:8080";
-  static const String websocketBaseUrl = "ws://192.168.137.1:8080/ws";
+  static const String baseUrl = "http://10.0.2.2:8080";
+  static const String websocketBaseUrl = "ws://10.0.2.2:8080/ws";
   //debug Handphone 192.168.68.246
   //debug Laptop 10.0.2.2
 

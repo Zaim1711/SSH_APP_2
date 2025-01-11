@@ -11,7 +11,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/main.dart';
 import 'package:ssh_aplication/model/NotificationRequest.dart';
-import 'package:ssh_aplication/package/LandingPageChat.dart';
+import 'package:ssh_aplication/package/UserPage/LandingPageChat.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class NotificationService {

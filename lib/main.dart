@@ -2,8 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/LoadPage.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/LoadPage.dart';
 
 void main() async {
   WidgetsFlutterBinding

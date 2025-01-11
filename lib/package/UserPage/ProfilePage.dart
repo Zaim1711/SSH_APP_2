@@ -8,10 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart'; // Make sure to import the correct path
 import 'package:ssh_aplication/component/logout_button.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/LoginPage.dart';
-import 'package:ssh_aplication/package/PengaduanPage.dart';
-import 'package:ssh_aplication/package/UserDetailsPage.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/LoginPage.dart';
+import 'package:ssh_aplication/package/UserPage/PengaduanPage.dart';
+import 'package:ssh_aplication/package/UserPage/UserDetailsPage.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class ProfilePage extends StatefulWidget {

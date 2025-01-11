@@ -9,9 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/My_TextField.dart';
 import 'package:ssh_aplication/component/my_button.dart';
 import 'package:ssh_aplication/component/password_TextField.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/SignUpPage.dart';
-import 'package:ssh_aplication/package/user.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/SignUpPage.dart';
+import 'package:ssh_aplication/package/UserPage/user.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 
 class LoginPage extends StatelessWidget {

@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
-import 'package:ssh_aplication/package/EmergencyPage.dart';
-import 'package:ssh_aplication/package/EventDetailPage.dart';
-import 'package:ssh_aplication/package/LandingPageChat.dart';
-import 'package:ssh_aplication/package/ProfilePage.dart';
+import 'package:ssh_aplication/package/UserPage/EmergencyPage.dart';
+import 'package:ssh_aplication/package/UserPage/EventDetailPage.dart';
+import 'package:ssh_aplication/package/UserPage/KonsultanPage.dart';
+import 'package:ssh_aplication/package/UserPage/LandingPageChat.dart';
+import 'package:ssh_aplication/package/UserPage/PengaduanPage.dart';
+import 'package:ssh_aplication/package/UserPage/ProfilePage.dart';
+import 'package:ssh_aplication/package/UserPage/TestInfromasiPage.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 import 'package:ssh_aplication/services/NotificatioonService.dart';
 import 'package:video_player/video_player.dart';
@@ -40,7 +42,6 @@ class _DasboardPageState extends State<DasboardPage> {
     notificationService.getDeviceToken().then((value) {
       print('device token');
     });
-    _requestLocationPermission();
   }
 
   @override
@@ -64,18 +65,6 @@ class _DasboardPageState extends State<DasboardPage> {
 
       // Panggil _loadDataLaporan dengan userId dan accessToken
       _loadDataLaporan(id, accessToken);
-    }
-  }
-
-  Future<void> _requestLocationPermission() async {
-    PermissionStatus status = await Permission.location.request();
-    if (status.isGranted) {
-      print("Location permission granted.");
-    } else if (status.isDenied) {
-      print("Location permission denied.");
-    } else if (status.isPermanentlyDenied) {
-      print("Location permission permanently denied.");
-      // Mungkin arahkan pengguna ke pengaturan aplikasi untuk mengaktifkan izin.
     }
   }
 
@@ -150,7 +139,7 @@ class _DasboardPageState extends State<DasboardPage> {
       if (index == 0) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EmergencyPage()),
+          MaterialPageRoute(builder: (context) => MultiPageForm()),
         );
       }
     });
@@ -465,6 +454,68 @@ class _DasboardPageState extends State<DasboardPage> {
                   ),
                 );
               }).toList(),
+            ),
+            Container(
+              width: 350,
+              height: 350,
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.blueAccent, width: 2),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Kami memahami bahwa berbicara tentang pengalaman kekerasan seksual bisa sangat sulit dan menyakitkan. Jika Anda atau seseorang yang Anda kenal telah mengalami kekerasan seksual, kami ingin Anda tahu bahwa Anda tidak sendirian. Kami di sini untuk mendengarkan dan memberikan dukungan yang Anda butuhkan.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Mengatur posisi tombol
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Konsultanpage()),
+                            );
+                          },
+                          child: const Text('Konsultasi'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10), // Jarak antara tombol
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InformationPage()),
+                            );
+                          },
+                          child: const Text('Informasi Hukum'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

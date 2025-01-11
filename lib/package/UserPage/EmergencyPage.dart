@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:ssh_aplication/services/LocationService.dart';
 import 'package:ssh_aplication/services/WebSocketConfig.dart';
 
@@ -27,6 +28,7 @@ class _EmergencyPageState extends State<EmergencyPage>
   @override
   void initState() {
     super.initState();
+    _requestLocationPermission();
     _isDisposed = false;
 
     // Inisialisasi AnimationController
@@ -83,6 +85,18 @@ class _EmergencyPageState extends State<EmergencyPage>
       setState(() {
         _currentLocation = location;
       });
+    }
+  }
+
+  Future<void> _requestLocationPermission() async {
+    PermissionStatus status = await Permission.location.request();
+    if (status.isGranted) {
+      print("Location permission granted.");
+    } else if (status.isDenied) {
+      print("Location permission denied.");
+    } else if (status.isPermanentlyDenied) {
+      print("Location permission permanently denied.");
+      // Mungkin arahkan pengguna ke pengaturan aplikasi untuk mengaktifkan izin.
     }
   }
 

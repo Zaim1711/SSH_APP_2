@@ -6,9 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ssh_aplication/model/userModel.dart';
-import 'package:ssh_aplication/package/ChatScreen.dart';
+import 'package:ssh_aplication/package/UserPage/ChatScreen.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
-import 'package:ssh_aplication/services/UserService.dart' as user_service;
 
 class UserService {
   Future<List<User>> fetchUsers() async {
@@ -79,63 +78,50 @@ class _UserListChatState extends State<UserListChat> {
     );
   }
 
-  Future<void> createRoom(User user, String userId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accesToken');
+  // Future<void> createRoom(User user, String userId) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? accessToken = prefs.getString('accesToken');
 
-    if (accessToken == null) {
-      print('Access token is null');
-      showNotification('Access token not found');
-      return;
-    }
+  //   if (accessToken == null) {
+  //     print('Access token is null');
+  //     showNotification('Access token not found');
+  //     return;
+  //   }
 
-    final url = Uri.parse(ApiConfig.createRoom);
-    final response = await http.post(url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $accessToken',
-        },
-        body: jsonEncode({
-          'senderId': userId,
-          'receiverId': user.id,
-        }));
+  //   final url = Uri.parse(ApiConfig.createRoom);
+  //   final response = await http.post(url,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $accessToken',
+  //       },
+  //       body: jsonEncode({
+  //         'senderId': userId,
+  //         'receiverId': user.id,
+  //       }));
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body);
-      int roomId = data['id'];
-      navigateToChatScreen(roomId.toString(), user.id.toString(), userId);
-    } else {
-      if (response.statusCode == 409) {
-        showNotification('Chat sudah ada.');
-      } else {
-        print('An error occurred: ${response.body}');
-      }
-    }
-  }
+  //   if (response.statusCode == 201) {
+  //     final data = jsonDecode(response.body);
+  //     int roomId = data['id'];
+  //     navigateToChatScreen(roomId.toString(), user.id.toString(), userId);
+  //   } else {
+  //     if (response.statusCode == 409) {
+  //       showNotification('Chat sudah ada.');
+  //     } else {
+  //       print('An error occurred: ${response.body}');
+  //     }
+  //   }
+  // }
 
-  void navigateToChatScreen(
-      String roomId, String receiverId, String userId) async {
-    try {
-      User user = await user_service.UserService().fetchUser(receiverId);
-      if (user != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Chatscreen(
-              user: user,
-              roomId: roomId,
-              senderId: userId,
-            ),
-          ),
-        );
-      } else {
-        showNotification('Gagal mengambil detail pengguna.');
-      }
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching user: $error')),
-      );
-    }
+  void navigateToChatScreen(User user, String userId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Chatscreen(
+          user: user,
+          senderId: userId,
+        ),
+      ),
+    );
   }
 
   @override
@@ -171,12 +157,14 @@ class _UserListChatState extends State<UserListChat> {
             itemBuilder: (context, index) {
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundImage: users[index].profileImage.isNotEmpty
-                      ? NetworkImage(users[index].profileImage)
-                      : AssetImage(defaultProfileImagePath) as ImageProvider,
+                  radius: 20,
+                  child: Text(
+                    users[index].username[0].toUpperCase(),
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 title: Text(users[index].email),
-                onTap: () => createRoom(users[index], userId),
+                onTap: () => navigateToChatScreen(users[index], userId),
               );
             },
           );

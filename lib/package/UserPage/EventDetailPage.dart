@@ -2,11 +2,11 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ssh_aplication/component/bottom_navigator.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/PengaduanPage.dart';
-import 'package:ssh_aplication/package/ProfilePage.dart';
-import 'package:ssh_aplication/package/TestInfromasiPage.dart';
-import 'package:ssh_aplication/package/UserListChat.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/PengaduanPage.dart';
+import 'package:ssh_aplication/package/UserPage/ProfilePage.dart';
+import 'package:ssh_aplication/package/UserPage/TestInfromasiPage.dart';
+import 'package:ssh_aplication/package/UserPage/UserListChat.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart';
 import 'package:video_player/video_player.dart';
 

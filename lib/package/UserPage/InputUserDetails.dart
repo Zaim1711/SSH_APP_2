@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ssh_aplication/package/DasboardPage.dart';
-import 'package:ssh_aplication/package/UserDetailsPage.dart';
+import 'package:ssh_aplication/package/UserPage/DasboardPage.dart';
+import 'package:ssh_aplication/package/UserPage/UserDetailsPage.dart';
 import 'package:ssh_aplication/services/ApiConfig.dart'; // Pastikan Anda mengimpor DashboardPage
 
 class InputUserDetails extends StatefulWidget {

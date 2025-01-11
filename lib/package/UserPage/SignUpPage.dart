@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ssh_aplication/component/My_TextField.dart';
 import 'package:ssh_aplication/component/button_signup.dart';
 import 'package:ssh_aplication/component/password_TextField.dart';
-import 'package:ssh_aplication/package/LoginPage.dart';
+import 'package:ssh_aplication/package/UserPage/LoginPage.dart';
 import 'package:ssh_aplication/service.dart';
 
 class SignUpPage extends StatelessWidget {
